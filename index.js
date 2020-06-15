@@ -57,8 +57,8 @@ app.get('/api/persons/:id', (request, response) => {
     person ? response.json(person) : response.status(404).end();
 
 })
-app.get('/api/info', (request, response) => {
-    let contactsLength = persons.length()
+app.get('/info', (request, response) => {
+    let contactsLength = persons.length
     let currentTime = new Date()
     let info = `Phonebook has info for ${contactsLength} people \n ${currentTime}`
     response.send(info)
@@ -90,7 +90,6 @@ app.post('/api/persons', (request, response) => {
             error: 'name must be unique'
         })
     }
-
     person.id = generateId(persons)
     persons = persons.concat(person)
     response.json(person)
