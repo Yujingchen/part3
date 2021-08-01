@@ -1,22 +1,32 @@
-
 const mongoose = require('mongoose')
 const uniqueValidator = require('mongoose-unique-validator')
 mongoose.set('useFindAndModify', false)
 require('dotenv').config()
 
 const url = process.env.MONGODB_URI
+if (!url) {
+  console.log('Please ptovide connection MongoDB URI to start using the DB');
+  process.exit(1)
+}
+else {
+  console.log('connecting to', url)
+}
 
-console.log('connecting to', url)
-
-mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true }).then(result => {
-  console.log(result)
-  console.log('connected to mongo db')
+mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true })
+  .then(result => {
+    console.log(result)
+    console.log('connected to mongo db')
 })
   .catch((error) => {
     console.log('error connecting to mongoDB: ', error.message)
   })
 
 const personSchema = new mongoose.Schema({
+  id:{
+  type: Number,
+  required: true,
+  unique: true
+  },
   name: {
     type: String,
     minlength: 3,
@@ -25,6 +35,7 @@ const personSchema = new mongoose.Schema({
   },
   number: {
     type: String,
+    minlength: 8,
     // validate: {
     //     validator: function (v) {
     //         return /\d{3}\d{3}\d{4}/.test(v);

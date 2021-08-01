@@ -6,49 +6,19 @@ const cors = require('cors')
 const Person = require('./models/person')
 require('dotenv').config()
 
-
-
 app.use(express.static('build'))
 app.use(express.json())
 morgan.token('reqBody', function (request, response) { return JSON.stringify(request.body) })
-app.use(morgan(':method :url :status :res[content-length] :response-time ms - :reqBody')
+app.use(morgan(':method :url :status :res[content-length] - :response-time ms :reqBody')
 )
 app.use(cors())
-
-// let persons =
-//     [
-//         {
-//             "name": "Arto Hellas",
-//             "number": "1234567",
-//             "id": 1
-//         },
-//         {
-//             "name": "Ada Lovelace",
-//             "number": "234-123-556",
-//             "id": 2
-//         },
-//         {
-//             "name": "Dan Abramov",
-//             "number": "12-43-234345",
-//             "id": 3
-//         },
-//         {
-//             "name": "Mary Poppendieck",
-//             "number": "39-23-6423122",
-//             "id": 4
-//         },
-//         {
-//             "name": "Mike Soft",
-//             "number": "243-1234-34231",
-//             "id": 5
-//         }
-//     ]
 
 app.get('/api/persons', (request, response) => {
   Person.find({}).then(persons => {
     response.json(persons)
   })
 })
+
 app.get('/api/persons/:id', (request, response, next) => {
   let id = request.params.id
   Person.findById(id).then(person => {
@@ -63,14 +33,16 @@ app.get('/api/persons/:id', (request, response, next) => {
     next(error)
   })
 })
+
 app.get('/info', (request, response) => {
   Person.find({}).then(persons => {
     let contactsLength = persons.length
     let currentTime = new Date()
-    let info = `Phonebook has info for ${contactsLength} people \n ${currentTime}`
+    let info = `<p>Phonebook has info for ${contactsLength} people<br/>${currentTime}<p>`
     response.send(info)
   })
 })
+
 // app.delete('/api/persons/:id', (request, response) => {
 //     let id = Number(request.params.id)
 //     persons = persons.filter(person => person.id !== id)
@@ -82,11 +54,12 @@ app.get('/info', (request, response) => {
 //     //     Math.max(...persons.map(p => p.id)) : 0
 //     return newId
 // }
+
 app.post('/api/persons', (request, response, next) => {
   let body = request.body
   if (!body.name || !body.number) {
     return response.status(400).json({
-      error: 'contact info missing'
+      error: 'person info missing'
     })
   }
   Person.find({}).then(persons => {
@@ -98,6 +71,7 @@ app.post('/api/persons', (request, response, next) => {
     }
     else {
       let person = new Person({
+        id: Math.random(100000000),
         name: body.name,
         number: body.number
       })
@@ -109,21 +83,9 @@ app.post('/api/persons', (request, response, next) => {
         }
         ).catch(error => next(error))
     }
-
-    //no checking name
-    // let person = new Person({
-    //     name: body.name,
-    //     number: body.number
-    // })
-    // person.save()
-    //     .then(savedPerson => savedPerson.toJSON())
-    //     .then(savedAndFormattedPerson => {
-    //         console.log(savedAndFormattedPerson)
-    //         response.json(savedAndFormattedPerson)
-    //     }
-    //     ).catch(error => next(error))
   }).catch(error => next(error))
 })
+
 app.put('/api/persons/:id', (request, response, next) => {
   const body = request.body
   const person = {
@@ -135,6 +97,7 @@ app.put('/api/persons/:id', (request, response, next) => {
     response.json(updatedPerson)
   }).catch(error => next(error))
 })
+
 app.delete('/api/persons/:id', (request, response, next) => {
   Person.findByIdAndRemove(request.params.id).then(result => {
     console.log(result)
@@ -150,9 +113,9 @@ const unknownEndpoint = (request, response) => {
 }
 app.use(unknownEndpoint)
 
-
+// middleware order
 const errorHandler = (error, request, response, next) => {
-  console.log(error)
+  console.log(error.message);
   if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(404).send({ error: 'malformatted id' })
   }
@@ -164,7 +127,7 @@ const errorHandler = (error, request, response, next) => {
 
 app.use(errorHandler)
 
-const Port = process.env.PORT
+const Port = process.env.PORT || 3001
 app.listen(Port, () => {
   console.log(`Server running on port ${Port}`)
 })
