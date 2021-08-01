@@ -8,7 +8,7 @@ require('dotenv').config()
 
 app.use(express.static('build'))
 app.use(express.json())
-morgan.token('reqBody', function (request, response) { return JSON.stringify(request.body) })
+morgan.token('reqBody', function (request) { return JSON.stringify(request.body) })
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :reqBody')
 )
 app.use(cors())
@@ -115,7 +115,7 @@ app.use(unknownEndpoint)
 
 // middleware order
 const errorHandler = (error, request, response, next) => {
-  console.log(error.message);
+  console.log(error.message)
   if (error.name === 'CastError' && error.kind === 'ObjectId') {
     return response.status(404).send({ error: 'malformatted id' })
   }

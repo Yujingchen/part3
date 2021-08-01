@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+require('dotenv').config()
 
 if (process.argv.length < 3) {
   console.log('Please ptovide the password as an argu,emt: node mongo.js <Passowrd>')
@@ -8,8 +9,7 @@ if (process.argv.length < 3) {
 
 const password = process.argv[2]
 console.log(password);
-const url = `mongodb+srv://mgadmin:${password}@cluster0.fqi4y.mongodb.net/test?retryWrites=true&w=majority`
-// const url = 'mongodb+srv://mgadmin:4mI1wpebTg@cluster0.fqi4y.mongodb.net/contacts?retryWrites=true&w=majority';
+const url = process.env.MONGODB_URI
 mongoose.connect(url, { useNewUrlParser: true, useUnifiedTopology: true })
 
 const personSchema = new mongoose.Schema({

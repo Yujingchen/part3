@@ -1,1 +1,1 @@
-App runs on heroku https://hhphonebook.herokuapp.com/
+heroku https://hhphonebook.herokuapp.com/
